@@ -1,0 +1,16 @@
+plugins {
+    id("newswise.android.library")
+    id("newswise.android.hilt")
+}
+
+
+dependencies {
+    implementation(project(":core:common"))
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.serialization)
+
+    implementation(platform(libs.okhttp.bom))
+    implementation(libs.okhttp)
+    implementation(libs.okhttp.logging.interceptor)
+    testImplementation(libs.okhttp.mockwebserver)
+}
