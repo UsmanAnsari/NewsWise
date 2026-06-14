@@ -1,5 +1,6 @@
 plugins {
     id("newswise.android.library")
+    id("newswise.android.hilt")
 }
 
 dependencies {
