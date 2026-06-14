@@ -8,6 +8,7 @@ dependencies {
     implementation(project(":core:common"))
     implementation(libs.retrofit)
     implementation(libs.retrofit.serialization)
+    implementation(libs.kotlinx.serialization.json)
 
     implementation(platform(libs.okhttp.bom))
     implementation(libs.okhttp)

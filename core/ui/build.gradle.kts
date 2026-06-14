@@ -5,7 +5,6 @@ plugins {
 
 
 dependencies {
-    implementation(project(":core:common"))
     implementation(project(":core:domain"))
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)

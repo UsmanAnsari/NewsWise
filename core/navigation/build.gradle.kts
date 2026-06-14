@@ -7,4 +7,5 @@ plugins {
 dependencies {
     api(libs.navigation.compose)
     api(libs.kotlinx.serialization.json)
+    implementation(libs.androidx.compose.material.icons)
 }
