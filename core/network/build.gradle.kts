@@ -1,6 +1,7 @@
 plugins {
     id("newswise.android.library")
     id("newswise.android.hilt")
+    alias(libs.plugins.kotlin.serialization)
 }
 
 
