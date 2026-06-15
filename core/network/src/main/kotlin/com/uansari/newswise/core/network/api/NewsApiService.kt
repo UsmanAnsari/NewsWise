@@ -12,7 +12,7 @@ interface NewsApiService {
         @Query("category") category: String,
         @Query("page") page: Int,
         @Query("pageSize") pageSize: Int,
-        @Query("country") country: String = "gb"
+        @Query("country") country: String = "us"
     ): NewsResponseDto
 
     // GET https://newsapi.org/v2/everything?q=kotlin&page=1&pageSize=20&sortBy=publishedAt
