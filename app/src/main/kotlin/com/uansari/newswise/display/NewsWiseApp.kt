@@ -1,28 +1,24 @@
 package com.uansari.newswise.display
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.uansari.newswise.core.navigation.BookmarksRoute
 import com.uansari.newswise.core.navigation.HeadlinesRoute
 import com.uansari.newswise.core.navigation.SearchRoute
 import com.uansari.newswise.core.navigation.TopLevelDestination
+import com.uansari.newswise.feature.bookmarks.navigation.bookmarkScreen
 import com.uansari.newswise.feature.headlines.navigation.headlinesScreen
 import com.uansari.newswise.feature.search.navigation.searchScreen
 
@@ -73,21 +69,16 @@ fun NewsWiseApp() {
             startDestination = HeadlinesRoute,
             modifier = Modifier.padding(paddingValues)
         ) {
-            headlinesScreen(onArticleClick = {
+            headlinesScreen {
                 /* Detail */
-            })
-            searchScreen(onArticleClick = {
-                /* Detail */
-            })
+            }
 
-            composable<BookmarksRoute> {
-                Box(
-                    modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "Bookmarks", style = MaterialTheme.typography.titleLarge
-                    )
-                }
+            searchScreen {
+                /* Detail */
+            }
+
+            bookmarkScreen {
+                /* Detail */
             }
         }
     }
