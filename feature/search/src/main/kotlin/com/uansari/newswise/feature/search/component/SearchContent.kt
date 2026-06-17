@@ -43,6 +43,7 @@ import com.uansari.newswise.feature.search.display.SearchUiState
 internal fun SearchContent(
     uiState: SearchUiState,
     searchResults: LazyPagingItems<Article>,
+    bookmarkedUrls: Set<String>,
     onEvent: (SearchUiEvent) -> Unit
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -54,7 +55,7 @@ internal fun SearchContent(
             onValueChange = { onEvent(SearchUiEvent.OnQueryChanged(it)) },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
+                .padding(horizontal = 16.dp, vertical = 4.dp),
             placeholder = { Text("Search articles...") },
             leadingIcon = {
                 Icon(
@@ -116,11 +117,16 @@ internal fun SearchContent(
                             val article = searchResults[index]
                             if (article != null) {
                                 ArticleCard(
-                                    article = article, onClick = {
-                                    onEvent(SearchUiEvent.OnArticleClick(article.url))
-                                }, onBookmarkClick = {
-                                    onEvent(SearchUiEvent.OnBookmarkClick(article.url))
-                                }, modifier = Modifier.animateItem()
+                                    article = article.copy(isBookmarked = article.url in bookmarkedUrls),
+                                    onClick = { onEvent(SearchUiEvent.OnArticleClick(article)) },
+                                    onBookmarkClick = {
+                                        onEvent(
+                                            SearchUiEvent.OnBookmarkClick(
+                                                article
+                                            )
+                                        )
+                                    },
+                                    modifier = Modifier.animateItem()
                                 )
                             } else {
                                 ShimmerArticleCard()

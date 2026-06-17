@@ -1,8 +1,22 @@
 package com.uansari.newswise.core.data.mapper
 
+import com.uansari.newswise.core.database.model.ArticleEntity
 import com.uansari.newswise.core.domain.model.Article
 import com.uansari.newswise.core.network.model.ArticleDto
-import com.uansari.newswise.core.database.model.ArticleEntity
+
+fun Article.toEntity(): ArticleEntity = ArticleEntity(
+    url = url,
+    sourceId = null,
+    sourceName = sourceName,
+    author = author,
+    title = title,
+    description = description,
+    urlToImage = urlToImage,
+    publishedAt = publishedAt,
+    content = content,
+    category = category,
+    isBookmarked = isBookmarked
+)
 
 fun ArticleDto.toEntity(category: String): ArticleEntity = ArticleEntity(
     url = url,
@@ -15,7 +29,7 @@ fun ArticleDto.toEntity(category: String): ArticleEntity = ArticleEntity(
     publishedAt = publishedAt,
     content = content,
     category = category,
-    isBookmarked = false // New articles from network are never bookmarked
+    isBookmarked = false
 )
 
 fun ArticleDto.toDomain(category: String = "search"): Article = Article(

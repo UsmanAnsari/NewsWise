@@ -1,6 +1,8 @@
 package com.uansari.newswise.core.domain.usecase
 
 import com.google.common.truth.Truth.assertThat
+import com.uansari.newswise.core.domain.repository.InlineFakeRepository
+import com.uansari.newswise.core.domain.repository.makeTestArticle
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
