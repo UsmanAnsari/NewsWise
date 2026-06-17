@@ -2,8 +2,10 @@ package com.uansari.newswise.feature.search
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import com.uansari.newswise.core.domain.usecase.GetBookmarksUseCase
 import com.uansari.newswise.core.domain.usecase.SearchArticlesUseCase
 import com.uansari.newswise.core.domain.usecase.ToggleBookmarkUseCase
+import com.uansari.newswise.core.domain.usecase.UpsertArticleUseCase
 import com.uansari.newswise.core.testing.factory.ArticleFactory
 import com.uansari.newswise.core.testing.fake.FakeArticleRepository
 import com.uansari.newswise.core.testing.rule.TestDispatcherRule
@@ -29,7 +31,9 @@ class SearchViewModelTest {
         fakeRepository = FakeArticleRepository()
         viewModel = SearchViewModel(
             searchArticles = SearchArticlesUseCase(fakeRepository),
-            toggleBookmark = ToggleBookmarkUseCase(fakeRepository)
+            toggleBookmark = ToggleBookmarkUseCase(fakeRepository),
+            upsertArticle = UpsertArticleUseCase(fakeRepository),
+            getBookmarks = GetBookmarksUseCase(fakeRepository)
         )
     }
 
@@ -75,13 +79,14 @@ class SearchViewModelTest {
 
     @Test
     fun `OnArticleClick event emits NavigateToDetail effect`() = runTest {
-        val url = "https://example.com/article"
+        val article = ArticleFactory.makeArticle()
+        fakeRepository.setArticles(listOf(article))
 
         viewModel.uiEffect.test {
-            viewModel.onEvent(SearchUiEvent.OnArticleClick(url))
+            viewModel.onEvent(SearchUiEvent.OnArticleClick(article))
             val effect = awaitItem()
             assertThat(effect).isInstanceOf(SearchUiEffect.NavigateToDetail::class.java)
-            assertThat((effect as SearchUiEffect.NavigateToDetail).url).isEqualTo(url)
+            assertThat((effect as SearchUiEffect.NavigateToDetail).url).isEqualTo(article.url)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -91,11 +96,9 @@ class SearchViewModelTest {
         val article = ArticleFactory.makeArticle()
         fakeRepository.setArticles(listOf(article))
 
-        viewModel.onEvent(SearchUiEvent.OnBookmarkClick(article.url))
+        viewModel.onEvent(SearchUiEvent.OnBookmarkClick(article))
 
-        val bookmarks = fakeRepository.getBookmarks().first()
-        assertThat(bookmarks).hasSize(1)
-        assertThat(bookmarks.first().url).isEqualTo(article.url)
+        assertThat(fakeRepository.getBookmarks().first()).hasSize(1)
     }
 
     @Test
@@ -104,7 +107,7 @@ class SearchViewModelTest {
         fakeRepository.setArticles(listOf(article))
         fakeRepository.setBookmarks(listOf(article))
 
-        viewModel.onEvent(SearchUiEvent.OnBookmarkClick(article.url))
+        viewModel.onEvent(SearchUiEvent.OnBookmarkClick(article))
 
         assertThat(fakeRepository.getBookmarks().first()).isEmpty()
     }
@@ -118,6 +121,29 @@ class SearchViewModelTest {
                 viewModel.onEvent(SearchUiEvent.OnQueryChanged(query))
                 assertThat(awaitItem().query).isEqualTo(query)
             }
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `OnBookmarkClick upserts article before toggling`() = runTest {
+        val article = ArticleFactory.makeArticle()
+        viewModel.onEvent(SearchUiEvent.OnBookmarkClick(article))
+
+        assertThat(fakeRepository.getBookmarks().first()).hasSize(1)
+    }
+
+    @Test
+    fun `bookmarkedUrls updates reactively when bookmark changes`() = runTest {
+        val article = ArticleFactory.makeArticle()
+        fakeRepository.setArticles(listOf(article))
+
+        viewModel.bookmarkedUrls.test {
+            assertThat(awaitItem()).isEmpty()
+
+            fakeRepository.setBookmarks(listOf(article))
+            assertThat(awaitItem()).contains(article.url)
 
             cancelAndIgnoreRemainingEvents()
         }

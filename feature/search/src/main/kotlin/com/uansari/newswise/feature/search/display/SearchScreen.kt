@@ -15,6 +15,7 @@ fun SearchScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val searchResults = viewModel.searchResults.collectAsLazyPagingItems()
+    val bookmarkedUrls by viewModel.bookmarkedUrls.collectAsStateWithLifecycle()
     val currentOnArticleClick by rememberUpdatedState(onArticleClick)
 
     LaunchedEffect(Unit) {
@@ -26,6 +27,9 @@ fun SearchScreen(
     }
 
     SearchContent(
-        uiState = uiState, searchResults = searchResults, onEvent = viewModel::onEvent
+        uiState = uiState,
+        searchResults = searchResults,
+        bookmarkedUrls = bookmarkedUrls,
+        onEvent = viewModel::onEvent
     )
 }

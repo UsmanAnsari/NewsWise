@@ -25,6 +25,9 @@ interface ArticleDao {
     @Query("SELECT * FROM articles WHERE url = :url")
     suspend fun getArticleByUrl(url: String): ArticleEntity?
 
+    @Query("SELECT * FROM articles WHERE url = :url")
+    fun observeArticleByUrl(url: String): Flow<ArticleEntity?>
+
     @Query("UPDATE articles SET isBookmarked = :isBookmarked WHERE url = :url")
     suspend fun updateBookmarkStatus(url: String, isBookmarked: Boolean)
 

@@ -9,9 +9,11 @@ interface ArticleRepository {
 
     fun getHeadlinesByCategory(category: NewsCategory): Flow<PagingData<Article>>
 
+    suspend fun upsertArticle(article: Article)
+
+    fun observeArticle(url: String): Flow<Article?>
 
     fun searchArticles(query: String): Flow<PagingData<Article>>
-
 
     fun getBookmarks(): Flow<List<Article>>
 
