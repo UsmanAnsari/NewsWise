@@ -9,8 +9,12 @@ data class DetailUiState(
 sealed class DetailUiEvent {
     data object OnBookmarkClick : DetailUiEvent()
     data object OnBackClick : DetailUiEvent()
+    data object OnShareClick : DetailUiEvent()
+    data object OnViewSourceClick : DetailUiEvent()
 }
 
 sealed class DetailUiEffect {
     data object NavigateBack : DetailUiEffect()
+    data class ShareArticle(val title: String, val url: String) : DetailUiEffect()
+    data class OpenInBrowser(val url: String) : DetailUiEffect()
 }
