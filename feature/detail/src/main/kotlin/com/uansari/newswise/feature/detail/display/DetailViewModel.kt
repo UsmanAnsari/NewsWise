@@ -46,6 +46,8 @@ class DetailViewModel @Inject constructor(
         when (event) {
             is DetailUiEvent.OnBookmarkClick -> onBookmarkClick()
             is DetailUiEvent.OnBackClick -> onBackClick()
+            is DetailUiEvent.OnShareClick -> onShareClick()
+            is DetailUiEvent.OnViewSourceClick -> onViewSourceClick()
         }
     }
 
@@ -58,6 +60,26 @@ class DetailViewModel @Inject constructor(
     private fun onBackClick() {
         viewModelScope.launch {
             _uiEffect.emit(DetailUiEffect.NavigateBack)
+        }
+    }
+
+    private fun onShareClick() {
+        viewModelScope.launch {
+            uiState.value.article?.let { article ->
+                _uiEffect.emit(
+                    DetailUiEffect.ShareArticle(
+                        title = article.title, url = article.url
+                    )
+                )
+            }
+        }
+    }
+
+    private fun onViewSourceClick() {
+        viewModelScope.launch {
+            uiState.value.article?.let { article ->
+                _uiEffect.emit(DetailUiEffect.OpenInBrowser(article.url))
+            }
         }
     }
 }
