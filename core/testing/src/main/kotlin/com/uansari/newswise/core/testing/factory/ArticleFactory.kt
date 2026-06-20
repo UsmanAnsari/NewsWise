@@ -1,7 +1,7 @@
 package com.uansari.newswise.core.testing.factory
 
-import com.uansari.newswise.core.domain.model.Article
 import com.uansari.newswise.core.database.model.ArticleEntity
+import com.uansari.newswise.core.domain.model.Article
 import com.uansari.newswise.core.domain.model.NewsCategory
 import kotlin.random.Random
 
@@ -27,12 +27,13 @@ object ArticleFactory {
     )
 
     fun makeArticleList(
-        count: Int = 5,
+        count: Int = 10,
         category: String = NewsCategory.GENERAL.value
     ) = List(count) { index ->
         makeArticle(
-            url = "https://example.com/article-$index",
+            url = "https://example.com/test-article-$index",
             title = "Test Article $index",
+            isBookmarked = setOf(true, false).random(),
             category = category
         )
     }

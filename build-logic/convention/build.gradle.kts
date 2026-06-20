@@ -5,7 +5,7 @@ plugins {
 group = "com.uansari.newswise.buildlogic"
 
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain(21)
 }
 
 dependencies {
