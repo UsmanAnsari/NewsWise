@@ -34,11 +34,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import coil3.compose.AsyncImage
 import com.uansari.newswise.core.domain.model.Article
+import com.uansari.newswise.core.ui.tags.TestTags
 
 @Composable
 fun ArticleCard(
@@ -54,6 +56,7 @@ fun ArticleCard(
     Card(
         modifier = modifier
             .fillMaxWidth()
+            .testTag(TestTags.ARTICLE_CARD)
             .clickable(onClick = onClick),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
@@ -110,7 +113,10 @@ fun ArticleCard(
                 horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = onBookmarkClick) {
+                IconButton(
+                    modifier = Modifier.testTag(TestTags.TOGGLE_BOOKMARK_BTN),
+                    onClick = onBookmarkClick
+                ) {
                     Icon(
                         imageVector = if (article.isBookmarked) Icons.Filled.Bookmark
                         else Icons.Outlined.BookmarkBorder,
