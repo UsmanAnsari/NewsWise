@@ -142,7 +142,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: NewsWise-release-v${{ github.run_number }}
-          path: app/build/outputs/apk/release/app-release.apk
+          path: app/build/outputs/apk/release/*.apk
           retention-days: 90
 
       - name: Upload release APK (feature/fix branches — 30-day retention)
@@ -150,7 +150,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: NewsWise-${{ steps.branch_name.outputs.branch }}-${{ github.run_number }}
-          path: app/build/outputs/apk/release/app-release.apk
+          path: app/build/outputs/apk/release/*.apk
           retention-days: 30
 
       - name: Display APK info
