@@ -1,6 +1,7 @@
 package com.uansari.newswise.core.ui.components
 
 import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,11 +12,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.OpenInNew
 import androidx.compose.material.icons.filled.Bookmark
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.BookmarkBorder
-import androidx.compose.material.icons.outlined.OpenInNew
 import androidx.compose.material.icons.outlined.Share
+import androidx.compose.material.icons.rounded.BrokenImage
+import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
@@ -32,12 +34,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toUri
 import coil3.compose.AsyncImage
 import com.uansari.newswise.core.domain.model.Article
 import com.uansari.newswise.core.ui.tags.TestTags
@@ -62,19 +64,19 @@ fun ArticleCard(
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
 
-            article.urlToImage?.let { imageUrl ->
-                AsyncImage(
-                    model = imageUrl,
-                    contentDescription = article.title,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp)
-                        .clip(MaterialTheme.shapes.medium),
-                    contentScale = ContentScale.Crop
-                )
-                Spacer(modifier = Modifier.height(12.dp))
-            }
+            AsyncImage(
+                model = article.urlToImage,
+                contentDescription = article.title,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+                    .clip(MaterialTheme.shapes.medium),
+                contentScale = ContentScale.Crop,
+                error = rememberVectorPainter(Icons.Rounded.BrokenImage),
+                fallback = rememberVectorPainter(Icons.Rounded.BrokenImage),
 
+                )
+            Spacer(modifier = Modifier.height(12.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -130,7 +132,7 @@ fun ArticleCard(
                 Box {
                     IconButton(onClick = { menuExpanded = true }) {
                         Icon(
-                            imageVector = Icons.Default.MoreVert,
+                            imageVector = Icons.Rounded.MoreVert,
                             contentDescription = "More options",
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -160,12 +162,13 @@ fun ArticleCard(
 
                         DropdownMenuItem(text = { Text("View in Browser") }, leadingIcon = {
                             Icon(
-                                imageVector = Icons.Outlined.OpenInNew, contentDescription = null
+                                imageVector = Icons.AutoMirrored.Rounded.OpenInNew,
+                                contentDescription = null
                             )
                         }, onClick = {
                             menuExpanded = false
                             context.startActivity(
-                                Intent(Intent.ACTION_VIEW, article.url.toUri())
+                                Intent(Intent.ACTION_VIEW, Uri.parse(article.url))
                             )
                         })
                     }

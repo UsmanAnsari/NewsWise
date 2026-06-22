@@ -6,7 +6,7 @@ import androidx.paging.PagingConfig
 import androidx.paging.testing.asSnapshot
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
-import androidx.test.ext.junit.runners.AndroidJUnit4
+import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.uansari.newswise.core.database.NewsDatabase
 import com.uansari.newswise.core.testing.factory.ArticleFactory
@@ -15,8 +15,11 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
-@RunWith(AndroidJUnit4::class)
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [36])
 class ArticleDaoTest {
 
     private lateinit var database: NewsDatabase
@@ -25,10 +28,6 @@ class ArticleDaoTest {
     @Before
     fun setUp() {
         val context = ApplicationProvider.getApplicationContext<Context>()
-        // inMemoryDatabaseBuilder: creates a Room database in memory.
-        // No files written to disk. Wiped between test runs.
-        // allowMainThreadQueries: only for tests — removes the "must run on
-        // background thread" restriction for setup/teardown convenience.
         database = Room.inMemoryDatabaseBuilder(
             context, NewsDatabase::class.java
         ).allowMainThreadQueries().build()
@@ -39,7 +38,7 @@ class ArticleDaoTest {
     fun tearDown() = database.close()
 
     @Test
-    fun upsert_articles_and_retrieve_by_category() = runTest {
+    fun `upsert articles and retrieve by category`() = runTest {
         val entity = ArticleFactory.makeEntity(category = "technology")
         articleDao.upsertArticles(listOf(entity))
 
@@ -52,7 +51,7 @@ class ArticleDaoTest {
     }
 
     @Test
-    fun toggle_bookmark_updates_isBookmarked_to_true() = runTest {
+    fun `toggle bookmark updates isBookmarked to true`() = runTest {
         val entity = ArticleFactory.makeEntity()
         articleDao.upsertArticles(listOf(entity))
 
@@ -63,16 +62,12 @@ class ArticleDaoTest {
     }
 
     @Test
-    fun delete_non_bookmarked_preserves_bookmarked_articles() = runTest {
+    fun `delete non bookmarked articles preserves bookmarked ones`() = runTest {
         val bookmarked = ArticleFactory.makeEntity(
-            url = "https://example.com/bookmarked",
-            category = "technology",
-            isBookmarked = true
+            url = "https://example.com/bookmarked", category = "technology", isBookmarked = true
         )
         val regular = ArticleFactory.makeEntity(
-            url = "https://example.com/regular",
-            category = "technology",
-            isBookmarked = false
+            url = "https://example.com/regular", category = "technology", isBookmarked = false
         )
         articleDao.upsertArticles(listOf(bookmarked, regular))
 
@@ -83,13 +78,15 @@ class ArticleDaoTest {
     }
 
     @Test
-    fun observe_bookmark_status_emits_updates() = runTest {
-        val entity = ArticleFactory.makeEntity()
+    fun `observe bookmark status emits true after update`() = runTest {
+        val entity = ArticleFactory.makeEntity(isBookmarked = false)
         articleDao.upsertArticles(listOf(entity))
 
-        // Phase 7 will use Turbine for flow assertions. For now, use simple collect.
-        articleDao.updateBookmarkStatus(entity.url, isBookmarked = true)
-        val isBookmarked = articleDao.getArticleByUrl(entity.url)?.isBookmarked
-        assertThat(isBookmarked).isTrue()
+        articleDao.observeBookmarkStatus(entity.url).test {
+            assertThat(awaitItem()).isFalse()
+            articleDao.updateBookmarkStatus(entity.url, true)
+            assertThat(awaitItem()).isTrue()
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 }

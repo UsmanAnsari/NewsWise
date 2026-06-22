@@ -4,6 +4,13 @@ plugins {
     id("newswise.android.room")
 }
 
+android {
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
+    }
+}
 
 dependencies {
     implementation(project(":core:common"))
@@ -11,6 +18,6 @@ dependencies {
     implementation(libs.room.paging)
     implementation(libs.androidx.paging.runtime)
 
-    androidTestImplementation(project(":core:testing"))
-    androidTestImplementation(libs.room.testing)
+    testImplementation(project(":core:testing"))
+    testImplementation(libs.room.testing)
 }

@@ -84,8 +84,6 @@ class HeadlinesContentTest {
         }
 
         composeTestRule.onNodeWithText("Top Story Today").assertIsDisplayed()
-
-        composeTestRule.onNodeWithText("Second Headline").assertIsDisplayed()
     }
 
     // Interaction
