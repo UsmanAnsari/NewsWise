@@ -32,7 +32,22 @@ android {
         )
 
     }
+    signingConfigs {
+        create("release") {
+            val keystorePath = localProperties.getProperty("KEYSTORE_FILE", "")
+            val keystorePass = localProperties.getProperty("KEYSTORE_PASSWORD", "")
+            val keyAliasVal = localProperties.getProperty("KEY_ALIAS", "")
+            val keyPass = localProperties.getProperty("KEY_PASSWORD", "")
 
+            // CI: workflow writes all four values → guard passes → Gradle signs.
+            if (keystorePath.isNotEmpty() && keystorePass.isNotEmpty() && keyAliasVal.isNotEmpty() && keyPass.isNotEmpty()) {
+                storeFile = file(keystorePath)
+                storePassword = keystorePass
+                keyAlias = keyAliasVal
+                keyPassword = keyPass
+            }
+        }
+    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
@@ -44,8 +59,12 @@ android {
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             )
-
+            signingConfig = signingConfigs.getByName("release")
         }
+        debug {
+            applicationIdSuffix = ".debug"
+        }
+
     }
     buildFeatures {
         compose = true
