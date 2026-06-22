@@ -1,0 +1,32 @@
+{
+  "status": "ok",
+  "totalResults": 2,
+  "articles": [
+    {
+      "source": {
+        "id": "bbc-news",
+        "name": "BBC News"
+      },
+      "author": "Jane Smith",
+      "title": "Test Article Title",
+      "description": "Test article description paragraph.",
+      "url": "https://bbc.com/article-1",
+      "urlToImage": "https://bbc.com/image-1.jpg",
+      "publishedAt": "2026-06-22T10:00:00Z",
+      "content": "Full article content here [+1234 chars]"
+    },
+    {
+      "source": {
+        "id": null,
+        "name": "Reuters"
+      },
+      "author": null,
+      "title": "Second Article Title",
+      "description": null,
+      "url": "https://reuters.com/article-2",
+      "urlToImage": null,
+      "publishedAt": "2026-06-22T09:00:00Z",
+      "content": null
+    }
+  ]
+}

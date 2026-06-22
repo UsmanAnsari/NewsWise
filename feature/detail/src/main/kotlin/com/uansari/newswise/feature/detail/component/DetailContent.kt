@@ -16,10 +16,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.rounded.OpenInNew
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.outlined.BookmarkBorder
-import androidx.compose.material.icons.outlined.OpenInNew
 import androidx.compose.material.icons.outlined.Share
+import androidx.compose.material.icons.rounded.BrokenImage
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -33,6 +34,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -100,7 +102,7 @@ internal fun DetailContent(
                     )
                 ) {
                     Icon(
-                        imageVector = Icons.Outlined.OpenInNew,
+                        imageVector = Icons.AutoMirrored.Rounded.OpenInNew,
                         contentDescription = null,
                         modifier = Modifier.size(ButtonDefaults.IconSize)
                     )
@@ -149,17 +151,17 @@ private fun ArticleDetailBody(
     article: Article, modifier: Modifier = Modifier
 ) {
     LazyColumn(modifier = modifier) {
-        article.urlToImage?.let { imageUrl ->
-            item(key = "hero_image") {
-                AsyncImage(
-                    model = imageUrl,
-                    contentDescription = article.title,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(240.dp),
-                    contentScale = ContentScale.Crop
-                )
-            }
+        item(key = "hero_image") {
+            AsyncImage(
+                model = article.urlToImage,
+                contentDescription = article.title,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(240.dp),
+                contentScale = ContentScale.Crop,
+                error = rememberVectorPainter( Icons.Rounded.BrokenImage ),
+                fallback = rememberVectorPainter( Icons.Rounded.BrokenImage ),
+            )
         }
 
         item(key = "body") {

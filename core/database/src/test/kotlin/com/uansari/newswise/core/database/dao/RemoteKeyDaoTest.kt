@@ -3,17 +3,19 @@ package com.uansari.newswise.core.database.dao
 import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.uansari.newswise.core.database.NewsDatabase
-import kotlinx.coroutines.test.runTest
 import com.uansari.newswise.core.database.model.RemoteKeyEntity
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
-@RunWith(AndroidJUnit4::class)
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [36])
 class RemoteKeyDaoTest {
 
     private lateinit var database: NewsDatabase

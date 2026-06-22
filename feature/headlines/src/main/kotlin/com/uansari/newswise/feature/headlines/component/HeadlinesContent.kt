@@ -20,6 +20,7 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
@@ -29,6 +30,7 @@ import com.uansari.newswise.core.ui.components.ArticleCard
 import com.uansari.newswise.core.ui.components.EmptyState
 import com.uansari.newswise.core.ui.components.ErrorState
 import com.uansari.newswise.core.ui.components.ShimmerArticleCard
+import com.uansari.newswise.core.ui.tags.TestTags
 import com.uansari.newswise.feature.headlines.display.HeadlinesUiEvent
 import com.uansari.newswise.feature.headlines.display.HeadlinesUiState
 
@@ -39,7 +41,7 @@ internal fun HeadlinesContent(
     articles: LazyPagingItems<Article>,
     onEvent: (HeadlinesUiEvent) -> Unit
 ) {
-    val isRefreshing = articles.loadState.refresh is LoadState.Loading
+    val isRefreshing = articles.loadState.refresh is LoadState.Loading && articles.itemCount > 0
 
     Column(modifier = Modifier.fillMaxSize()) {
 
@@ -55,27 +57,33 @@ internal fun HeadlinesContent(
             }
         }
 
-        Box(modifier = Modifier.fillMaxSize()) {
-            when {
-                isRefreshing && articles.itemCount == 0 -> HeadlinesLoadingContent()
+        Box(modifier = Modifier.weight(1f)) {
+            when (articles.loadState.refresh) {
+                is LoadState.Loading if articles.itemCount == 0 -> {
+                    HeadlinesLoadingContent()
+                }
 
-                articles.loadState.refresh is LoadState.Error && articles.itemCount == 0 -> {
+                is LoadState.Error if articles.itemCount == 0 -> {
                     val error = (articles.loadState.refresh as LoadState.Error).error
                     ErrorState(
                         message = error.localizedMessage ?: "Failed to load articles",
                         onRetry = { articles.retry() })
                 }
 
-                articles.loadState.refresh is LoadState.NotLoading && articles.itemCount == 0 -> {
+                is LoadState.NotLoading if articles.itemCount == 0 -> {
                     EmptyState(
                         message = "No articles in ${uiState.selectedCategory.displayName}",
-                        icon = Icons.Outlined.Newspaper
+                        icon = Icons.Outlined.Newspaper,
+                        modifier = Modifier.testTag(TestTags.EMPTY_STATE)
                     )
                 }
 
                 else -> {
                     PullToRefreshBox(
-                        isRefreshing = isRefreshing, onRefresh = { articles.refresh() }) {
+                        isRefreshing = isRefreshing,
+                        onRefresh = { articles.refresh() },
+                        modifier = Modifier.fillMaxSize()
+                    ) {
                         LazyColumn(
                             modifier = Modifier.fillMaxSize(),
                             contentPadding = PaddingValues(16.dp),
@@ -90,11 +98,7 @@ internal fun HeadlinesContent(
                                         article = article,
                                         onClick = { onEvent(HeadlinesUiEvent.OnArticleClick(article.url)) },
                                         onBookmarkClick = {
-                                            onEvent(
-                                                HeadlinesUiEvent.OnBookmarkClick(
-                                                    article.url
-                                                )
-                                            )
+                                            onEvent(HeadlinesUiEvent.OnBookmarkClick(article.url))
                                         },
                                         modifier = Modifier.animateItem()
                                     )
@@ -133,4 +137,3 @@ internal fun HeadlinesContent(
         }
     }
 }
-
