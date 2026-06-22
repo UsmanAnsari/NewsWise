@@ -13,10 +13,15 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
 
             extensions.configure<LibraryExtension> {
                 defaultConfig {
-                    testInstrumentationRunner =
-                        "com.uansari.newswise.core.testing.HiltTestRunner"
+                    testInstrumentationRunner = "com.uansari.newswise.core.testing.HiltTestRunner"
+                }
+                testOptions {
+                    unitTests {
+                        isIncludeAndroidResources = true
+                    }
                 }
             }
+
 
             dependencies {
                 add("implementation", project(":core:domain"))
@@ -29,6 +34,14 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
                 add("implementation", libsCatalog.library("androidx-lifecycle-runtime-compose"))
 
                 add("testImplementation", project(":core:testing"))
+
+                val bom = platform(libsCatalog.library("androidx-compose-bom"))
+                add("testImplementation", bom)
+                add("testImplementation", libsCatalog.library("robolectric"))
+
+                add("testImplementation", libsCatalog.library("androidx-compose-ui-test-junit4"))
+
+                add("testImplementation", libsCatalog.library("androidx-junit"))
                 add("androidTestImplementation", project(":core:testing"))
             }
         }

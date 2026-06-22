@@ -7,6 +7,8 @@ plugins {
 
 dependencies {
     api(project(":core:domain"))
+    api(project(":core:database"))
+
     api(libs.androidx.paging.testing)
 
     // ── Unit testing
@@ -25,6 +27,7 @@ dependencies {
     api(libs.androidx.truth.ext)
     api(libs.navigation.testing)
     api(libs.robolectric)
+    implementation(libs.room.runtime)
 
     // Hilt testing
     implementation(libs.hilt.android.testing)
