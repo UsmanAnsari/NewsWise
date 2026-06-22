@@ -101,65 +101,60 @@ jobs:
         run: chmod +x gradlew
 
       - name: Decode keystore
-        env:
-          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
         run: |
-          echo "$KEYSTORE_BASE64" | base64 --decode > $GITHUB_WORKSPACE/release-keystore.jks
-          echo "Keystore decoded: $(wc -c < $GITHUB_WORKSPACE/release-keystore.jks) bytes"
-
-      - name: Verify keystore
-        run: |
-          keytool -list \
-            -keystore $GITHUB_WORKSPACE/release-keystore.jks \
-            -storepass "${{ secrets.KEYSTORE_PASSWORD }}" \
-            -noprompt
-          echo "✓ Keystore is valid"
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > app/release-keystore.jks
 
       - name: Create local.properties
-        env:
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
-          echo "NEWS_API_KEY=${{ secrets.NEWS_API_KEY }}"                         > local.properties
-          echo "KEYSTORE_FILE=$GITHUB_WORKSPACE/release-keystore.jks"           >> local.properties
-          echo "KEYSTORE_PASSWORD=$KEYSTORE_PASSWORD"                           >> local.properties
-          echo "KEY_ALIAS=$KEY_ALIAS"                                           >> local.properties
-          echo "KEY_PASSWORD=$KEY_PASSWORD"                                     >> local.properties
-          
-            - name: Build release APK
-              run: ./gradlew assembleRelease --stacktrace --no-daemon
-          
-            - name: Get branch name
-              id: branch_name
-              run: |
-                if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-                  BRANCH="${GITHUB_HEAD_REF}"
-                else
-                  BRANCH="${GITHUB_REF#refs/heads/}"
-                fi
-                SAFE_BRANCH=$(echo "$BRANCH" | sed 's/\//-/g' | sed 's/[^a-zA-Z0-9._-]/-/g')
-                echo "branch=$SAFE_BRANCH" >> $GITHUB_OUTPUT
-                echo "Sanitized branch: $SAFE_BRANCH"
-          
-            - name: Upload release APK (main — 90-day retention)
-              if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-              uses: actions/upload-artifact@v4
-              with:
-                name: NewsWise-release-v${{ github.run_number }}
-                path: app/build/outputs/apk/release/*.apk
-                retention-days: 90
-          
-            - name: Upload release APK (feature/fix branches — 30-day retention)
-              if: github.ref != 'refs/heads/main'
-              uses: actions/upload-artifact@v4
-              with:
-                name: NewsWise-${{ steps.branch_name.outputs.branch }}-${{ github.run_number }}
-                path: app/build/outputs/apk/release/*.apk
-                retention-days: 30
-          
-            - name: Display APK info
-              run: |
-                echo "=== APK Information ==="
-                ls -lh app/build/outputs/apk/release/
-                echo "APK Size: $(du -h app/build/outputs/apk/release/app-release.apk | cut -f1)"
+          echo "NEWS_API_KEY=${{ secrets.NEWS_API_KEY }}"           > local.properties
+          echo "KEYSTORE_FILE=app/release-keystore.jks"            >> local.properties
+          echo "KEYSTORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }}" >> local.properties
+          echo "KEY_ALIAS=${{ secrets.KEY_ALIAS }}"                 >> local.properties
+          echo "KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}"           >> local.properties
+
+      - name: Cache Gradle packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties', '**/*.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Build release APK
+        run: ./gradlew assembleRelease --stacktrace --no-daemon
+
+      - name: Get branch name
+        id: branch_name
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            BRANCH="${GITHUB_HEAD_REF}"
+          else
+            BRANCH="${GITHUB_REF#refs/heads/}"
+          fi
+          SAFE_BRANCH=$(echo "$BRANCH" | sed 's/\//-/g' | sed 's/[^a-zA-Z0-9._-]/-/g')
+          echo "branch=$SAFE_BRANCH" >> $GITHUB_OUTPUT
+          echo "Sanitized branch: $SAFE_BRANCH"
+
+      - name: Upload release APK (main — 90-day retention)
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: actions/upload-artifact@v4
+        with:
+          name: NewsWise-release-v${{ github.run_number }}
+          path: app/build/outputs/apk/release/*.apk
+          retention-days: 90
+
+      - name: Upload release APK (feature/fix branches — 30-day retention)
+        if: github.ref != 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: NewsWise-${{ steps.branch_name.outputs.branch }}-${{ github.run_number }}
+          path: app/build/outputs/apk/release/*.apk
+          retention-days: 30
+
+      - name: Display APK info
+        run: |
+          echo "=== APK Information ==="
+          ls -lh app/build/outputs/apk/release/
+          echo "APK Size: $(du -h app/build/outputs/apk/release/app-release.apk | cut -f1)"

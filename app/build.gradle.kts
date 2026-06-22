@@ -32,25 +32,21 @@ android {
         )
 
     }
-    signingConfigs {
-        create("release") {
-            val keystorePath = localProperties.getProperty("KEYSTORE_FILE", "")
-            val keystorePass = localProperties.getProperty("KEYSTORE_PASSWORD", "")
-            val keyAliasVal = localProperties.getProperty("KEY_ALIAS", "")
-            val keyPass = localProperties.getProperty("KEY_PASSWORD", "")
 
-            // CI: workflow writes all four values → guard passes → Gradle signs.
-            if (keystorePath.isNotEmpty() && keystorePass.isNotEmpty() && keyAliasVal.isNotEmpty() && keyPass.isNotEmpty()) {
-                storeFile = file(keystorePath)
-                storePassword = keystorePass
-                keyAlias = keyAliasVal
-                keyPassword = keyPass
-            }
-        }
-    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
+    }
+    signingConfigs {
+        create("release") {
+            val keystorePath = localProperties.getProperty("KEYSTORE_FILE")
+            if (keystorePath != null) {
+                storeFile = rootProject.file(keystorePath)
+                storePassword = localProperties.getProperty("KEYSTORE_PASSWORD")
+                keyAlias = localProperties.getProperty("KEY_ALIAS")
+                keyPassword = localProperties.getProperty("KEY_PASSWORD")
+            }
+        }
     }
     buildTypes {
         release {
@@ -61,10 +57,6 @@ android {
             )
             signingConfig = signingConfigs.getByName("release")
         }
-        debug {
-            applicationIdSuffix = ".debug"
-        }
-
     }
     buildFeatures {
         compose = true
