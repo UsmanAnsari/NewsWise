@@ -61,11 +61,18 @@
 | Bookmarks | Bookmarks - Foldable Split |
 |:---------------------:|:-----------------:|
 | ![Bookmarks Phone](screenshots/Screenshot_Bookmark.png) | ![Bookmarks Split](screenshots/Screenshot_Bookmark_Expanded.png) |
-
 </div>
 
 ---
 
+## 🎬 [NewsWise DEMO - YouTube](https://youtu.be/44_Ot0A0ez0)
+<div align="center">
+
+|                NewsWise                |
+|:--------------------------------------:|
+| ![NewsWise](screenshots/NewsWise.gif)  |
+
+</div>
 ## 📲 Download & Install
 
 ### Option 1: GitHub Actions Artifact (Recommended)
@@ -262,14 +269,14 @@ The choice is consistent across all four features:
 
 ## 🧪 Testing
 
-83 tests across 6 modules. All run with `./gradlew test` - no emulator required.
+83 tests across 7 modules. All run with `./gradlew test` - no emulator required.
 
 ```
-Unit tests          54   ViewModels (28) + Use Cases (15) + helpers
-Integration tests   29   Room DAOs (6) + Compose UI (26) + MockWebServer (5) + ToggleBookmark (3, but counts as unit)
-E2E tests            0   deliberate - NewsAPI responses change hourly, making live assertions non-deterministic
+Unit tests          43   ViewModels (28) + Use Cases (15)
+Integration tests   40   Compose UI (29) + Room DAOs (6) + MockWebServer (5)
+E2E tests            0   deliberate — NewsAPI responses change hourly
 ─────────────────────────
-Total               83   across 17 test classes in 6 modules
+Total               83   across 16 test classes in 7 modules
 ```
 
 | Module | Test Class | Tests | Type |
